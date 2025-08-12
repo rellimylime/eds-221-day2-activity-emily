@@ -1,0 +1,62 @@
+---
+title: "Wild Data"
+format: html
+execute:
+  warning: FALSE
+  message: FALSE
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+```{r}
+mack_verts <- read_csv(here::here("data", "AS00601.csv"))
+view(mack_verts)
+```
+```{r}
+# Clean names
+mack_verts <- mack_verts %>% clean_names()
+names(mack_verts)
+```
+```{r}
+mc_wt_5 <- mack_verts$weight[5]
+mc_wt_5
+
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_length_8_20
+
+mc_dates <- mack_verts$sampledate
+```
+```{r}
+mc_salamanders <- dplyr::filter(mack_verts, species == "DITE")
+mc_salamanders
+```
+```{r}
+salamander_size_plot <- ggplot(data = mc_salamanders, aes(x = length1, y = weight, color = unittype)) +
+  geom_point(alpha = 0.2, size = 1) +
+  labs(x = "Snout-vent length (mm)", y = "Weight (g)", caption = "Mack Creek salamander & cutthroat trout data: \n https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-and.4027.14") + 
+  theme(plot.caption = element_text(hjust = 0.5)) +
+  facet_wrap(~unittype)
+
+salamander_size_plot
+
+ggsave(here::here("figs", "salamander_size.png"), height = 6, width = 7)
+```
+
+```{r}
+mc_trout <- dplyr::filter(mack_verts, species == "ONCL")
+
+mc_trout
+
+cutthroat_size_plot <- ggplot(data = mc_trout, aes(x = length1, y = weight, color = reach)) +
+  geom_point() +
+  labs(title = "Cutthroat Size Plot", x = "Snout-vent length (mm)", 
+       y = "Weight (g)") +
+  facet_wrap(~reach) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+cutthroat_size_plot
+```
+
